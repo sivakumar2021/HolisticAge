@@ -1,0 +1,75 @@
+import { ComponentType } from "@/generated/prisma/enums";
+
+export const COMPONENTS: ComponentType[] = [
+  ComponentType.MENTAL,
+  ComponentType.PHYSICAL,
+  ComponentType.FINANCIAL,
+  ComponentType.CAREER,
+  ComponentType.RELATIONSHIPS,
+  ComponentType.SOCIAL,
+  ComponentType.HABITS,
+  ComponentType.LEARNING,
+  ComponentType.PURPOSE,
+];
+
+export const COMPONENT_LABELS: Record<ComponentType, string> = {
+  MENTAL: "Mental",
+  PHYSICAL: "Physical",
+  FINANCIAL: "Financial",
+  CAREER: "Career",
+  RELATIONSHIPS: "Relationships",
+  SOCIAL: "Social",
+  HABITS: "Habits",
+  LEARNING: "Learning",
+  PURPOSE: "Purpose",
+};
+
+// Purpose (new, added at the user's request beyond the original graphic) is
+// weighted at 10%, the same as Relationships/Social/Habits/Learning. The
+// original 8 weights are scaled by 0.9 to make room while preserving their
+// relative importance to each other.
+export const DEFAULT_WEIGHTS: Record<ComponentType, number> = {
+  MENTAL: 18,
+  PHYSICAL: 18,
+  FINANCIAL: 9,
+  CAREER: 7.2,
+  RELATIONSHIPS: 10.8,
+  SOCIAL: 9,
+  HABITS: 9,
+  LEARNING: 9,
+  PURPOSE: 10,
+};
+
+const WEIGHT_SUM_TOLERANCE = 0.01;
+
+export function sumWeights(weights: Record<ComponentType, number>): number {
+  return COMPONENTS.reduce((sum, c) => sum + (weights[c] ?? 0), 0);
+}
+
+export function validateWeights(weights: Record<ComponentType, number>): {
+  valid: boolean;
+  sum: number;
+  error?: string;
+} {
+  const sum = sumWeights(weights);
+  for (const c of COMPONENTS) {
+    if (weights[c] == null || weights[c] < 0) {
+      return { valid: false, sum, error: `Missing or negative weight for ${c}` };
+    }
+  }
+  if (Math.abs(sum - 100) > WEIGHT_SUM_TOLERANCE) {
+    return { valid: false, sum, error: `Weights must sum to 100 (got ${sum.toFixed(2)})` };
+  }
+  return { valid: true, sum };
+}
+
+/** Merges a user's saved ComponentWeight rows over the defaults; any component without a row falls back to its default. */
+export function getEffectiveWeights(
+  overrides: { component: ComponentType; weight: number }[],
+): Record<ComponentType, number> {
+  const weights = { ...DEFAULT_WEIGHTS };
+  for (const o of overrides) {
+    weights[o.component] = o.weight;
+  }
+  return weights;
+}
