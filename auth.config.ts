@@ -6,6 +6,11 @@ const PROTECTED_APP_PATHS = /^\/(dashboard|assessment|history|settings|profile)(
 // runtime, needs Prisma/bcrypt). This file only holds what proxy.ts needs:
 // callbacks that read the JWT, no DB access.
 export default {
+  // Required behind a reverse proxy (Railway, Openship, etc.) — without this
+  // Auth.js rejects the proxy-forwarded Host header as untrusted and every
+  // auth request fails with "UntrustedHost". Safe here since the app only
+  // ever expects to be reached via NEXT_PUBLIC_APP_URL's host.
+  trustHost: true,
   pages: {
     signIn: "/login",
   },
