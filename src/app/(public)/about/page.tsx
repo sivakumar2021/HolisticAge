@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AgelessLivingDiagram } from "@/components/about/AgelessLivingDiagram";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "About us — Holistic Age",
@@ -14,8 +14,15 @@ export default function AboutPage() {
         and how it fits together with the rest of the family of products are coming soon.
       </p>
 
-      <div className="my-12 rounded-xl border border-stone-200 bg-stone-50 p-8">
-        <AgelessLivingDiagram />
+      <div className="my-12">
+        <div className="relative aspect-[3/2] overflow-hidden rounded-2xl shadow-sm">
+          <Image
+            src="/about/interconnected-apps.jpg"
+            alt="Ageless Living at the center, orbited by Holistic Age, ArcScore, 3663 Lifestyle, and 3663 Fitness"
+            fill
+            className="object-cover"
+          />
+        </div>
         <p className="mt-6 text-center text-sm text-stone-500">
           Ageless Living is the philosophy at the center — Holistic Age, ArcScore, 3663 Lifestyle,
           and 3663 Fitness are each a different lens on living that out.

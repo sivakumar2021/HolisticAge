@@ -3,22 +3,20 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
-// Composited from real (free-license, no-attribution-required) photos — see
-// scripts/build-hero-images.mjs and assets/hero-src/.
 const SLIDES = [
   {
     src: "/hero/outdoors.jpg",
-    alt: "An older person walking with a cane and a younger person jogging, both outdoors",
+    alt: "A multi-generational group jogging, cycling, kayaking, and hiking together by a mountain lake",
     caption: "Can you relate to these images?",
   },
   {
     src: "/hero/professional.jpg",
-    alt: "An older professional and a younger professional, each at work",
+    alt: "Colleagues of different ages walking together through a city business district",
     caption: "What do these images signify in terms of age and ageing?",
   },
   {
     src: "/hero/social.jpg",
-    alt: "An older person and a younger person, each enjoying a coffee",
+    alt: "An extended family of all ages gathered for an evening get-together in a backyard",
     caption: "What is society's perception of ageing?",
   },
 ];
@@ -41,17 +39,17 @@ export function HeroCarousel() {
 
   return (
     <div
-      className="mx-auto max-w-3xl"
+      className="mx-auto max-w-4xl"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-        <div className="relative aspect-[2/1]">
-          <Image src={src} alt={alt} fill priority={index === 0} className="object-cover" />
+      <div className="relative aspect-[2.38/1] overflow-hidden rounded-2xl shadow-sm">
+        <Image src={src} alt={alt} fill priority={index === 0} className="object-cover" />
+        <div className="absolute inset-0 flex items-center">
+          <p className="max-w-xs px-6 text-xl font-semibold leading-snug text-white drop-shadow-sm sm:max-w-sm sm:px-10 sm:text-2xl">
+            {caption}
+          </p>
         </div>
-        <p className="border-t border-stone-100 px-6 py-4 text-center text-base font-medium text-stone-700">
-          {caption}
-        </p>
       </div>
 
       <div className="mt-4 flex justify-center gap-2">
