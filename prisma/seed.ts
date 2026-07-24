@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { ComponentType } from "../src/generated/prisma/enums";
-import { QUESTION_BANK } from "./questions";
+import { seedQuestions } from "./seed-questions";
 import { DEFAULT_WEIGHTS, COMPONENTS } from "../src/lib/weights";
 import { scoreToComponentAge, computeHolisticAge, normalizeGraded, normalizeYesNo, calcCalendarAge } from "../src/lib/scoring";
 
@@ -59,24 +59,14 @@ async function main() {
 
   console.log(`Seeded users: admin=${admin.email}, demo=${demo.email}`);
 
+  const questionCount = await seedQuestions(prisma);
+  const questions = await prisma.question.findMany();
   const questionByComponentType: Record<string, { id: string }> = {};
-  for (const q of QUESTION_BANK) {
-    const existing = await prisma.question.findFirst({
-      where: { component: q.component, type: q.type, order: q.order },
-      select: { id: true },
-    });
-    const question = existing
-      ? await prisma.question.update({
-          where: { id: existing.id },
-          data: { text: q.text, isActive: true },
-        })
-      : await prisma.question.create({
-          data: { component: q.component, type: q.type, text: q.text, order: q.order },
-        });
-    questionByComponentType[`${q.component}:${q.type}`] = question;
+  for (const q of questions) {
+    questionByComponentType[`${q.component}:${q.type}`] = q;
   }
 
-  console.log(`Seeded ${QUESTION_BANK.length} questions`);
+  console.log(`Seeded ${questionCount} questions`);
 
   const existingAssessmentCount = await prisma.assessment.count({ where: { userId: demo.id } });
   if (existingAssessmentCount > 0) {

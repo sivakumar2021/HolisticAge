@@ -10,7 +10,8 @@
     "test": "vitest run",
     "launch": "./scripts/launch.sh",
     "postinstall": "prisma generate",
-    "migrate:deploy": "prisma migrate deploy"
+    "migrate:deploy": "prisma migrate deploy",
+    "seed:questions": "tsx prisma/seed-questions.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",
