@@ -11,47 +11,49 @@ const SLIDES = [
   {
     src: "/hero/mental.jpg",
     alt: "A multi-generational group practicing yoga and meditation together in a park",
-    caption: "How sharp and clear does your mind feel these days?",
+    caption:
+      "Cultivate a clear, resilient, and positive mind that grows stronger through every experience.",
   },
   {
     src: "/hero/outdoors.jpg",
     alt: "A multi-generational group jogging, cycling, kayaking, and hiking together by a mountain lake",
-    caption: "Can you relate to these images?",
+    caption: "Build strength, energy, mobility, and vitality to live life fully and confidently.",
   },
   {
     src: "/hero/financial.jpg",
     alt: "Three generations of a family building a savings and financial plan together at home",
-    caption: "Does your financial life let you breathe easy — or keep you up at night?",
+    caption: "Create financial freedom and security that give you greater choice and independence.",
   },
   {
     src: "/hero/professional.jpg",
     alt: "Colleagues of different ages walking together through a city business district",
-    caption: "What do these images signify in terms of age and ageing?",
+    caption: "Keep evolving your skills, experience, and ambitions to stay relevant and fulfilled.",
   },
   {
     src: "/hero/relationships.jpg",
     alt: "A multi-generational family relaxing and talking together in a living room",
-    caption: "Are you nurturing the relationships that matter most?",
+    caption: "Nurture meaningful relationships built on love, trust, connection, and shared growth.",
   },
   {
     src: "/hero/social.jpg",
     alt: "An extended family of all ages gathered for an evening get-together in a backyard",
-    caption: "What is society's perception of ageing?",
+    caption:
+      "Build a vibrant social life through friendships, community, belonging, and shared experiences.",
   },
   {
     src: "/hero/habits.jpg",
     alt: "A family of different ages each practicing their own morning routine and daily habits at home",
-    caption: "Are your daily habits helping you age well?",
+    caption: "Shape everyday habits that strengthen your wellbeing, performance, and quality of life.",
   },
   {
     src: "/hero/learning.jpg",
     alt: "A grandfather reading to grandchildren surrounded by other family members reading in a library",
-    caption: "When did you last learn something new?",
+    caption: "Stay curious, explore new ideas, and keep expanding what you know and can do.",
   },
   {
     src: "/hero/purpose.jpg",
     alt: "A multi-generational group of volunteers building a house and planting trees together",
-    caption: "What gives your life a sense of purpose?",
+    caption: "Live with intention, contribute meaningfully, and pursue what makes life truly worthwhile.",
   },
 ];
 
