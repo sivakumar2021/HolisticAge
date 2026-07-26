@@ -96,7 +96,7 @@ export function AssessmentFlow({ questions }: { questions: QuestionDTO[] }) {
                 key={g.component}
                 type="button"
                 onClick={() => goTo(i)}
-                className={`shrink-0 whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
+                className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
                   isCurrent
                     ? "border-emerald-800 text-emerald-900"
                     : groupAnswered
@@ -105,6 +105,12 @@ export function AssessmentFlow({ questions }: { questions: QuestionDTO[] }) {
                 }`}
               >
                 {COMPONENT_LABELS[g.component]}
+                {groupAnswered && (
+                  <span
+                    aria-label="All questions answered"
+                    className="h-2 w-2 shrink-0 rounded-full bg-emerald-600"
+                  />
+                )}
               </button>
             );
           })}
