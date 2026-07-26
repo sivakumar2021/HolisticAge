@@ -38,6 +38,7 @@ enum QuestionType {
 enum EmailType {
   ACTIVATION
   REMINDER
+  PASSWORD_RESET
 }
 
 model User {
@@ -54,12 +55,13 @@ model User {
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
 
-  accounts         Account[]
-  sessions         Session[]
-  assessments      Assessment[]
-  componentWeights ComponentWeight[]
-  activationTokens ActivationToken[]
-  emailLogs        EmailLog[]
+  accounts            Account[]
+  sessions            Session[]
+  assessments         Assessment[]
+  componentWeights    ComponentWeight[]
+  activationTokens    ActivationToken[]
+  passwordResetTokens PasswordResetToken[]
+  emailLogs           EmailLog[]
 }
 
 model Account {
@@ -99,6 +101,17 @@ model VerificationToken {
 }
 
 model ActivationToken {
+  id        String    @id @default(cuid())
+  token     String    @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
   id        String    @id @default(cuid())
   token     String    @unique
   userId    String

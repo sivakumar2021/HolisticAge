@@ -38,7 +38,14 @@ export async function POST(request: Request) {
 
   const activationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/activate/${token}`;
   const { subject, html, text } = activationEmail(name ?? null, activationUrl);
-  await getEmailService().send({ to: email, subject, html, text });
+  try {
+    await getEmailService().send({ to: email, subject, html, text });
+  } catch (err) {
+    // Don't fail signup just because the activation email couldn't be
+    // delivered (e.g. Resend sandbox restrictions) — the account still
+    // exists and an admin can resend/share the link manually.
+    console.error("Failed to send activation email:", err);
+  }
 
   return NextResponse.json({ ok: true }, { status: 201 });
 }
