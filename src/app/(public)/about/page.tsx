@@ -44,7 +44,7 @@ export default function AboutPage() {
           className="object-cover"
         />
         {/* Lightens the source graphic's saturated space theme so it doesn't clash with the site's airy palette, and fades to white at the bottom so it melts into the page instead of cutting off sharply. */}
-        <div className="absolute inset-0 bg-white/35" />
+        <div className="absolute inset-0 bg-white/15" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white" />
       </section>
 
