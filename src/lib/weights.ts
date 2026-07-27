@@ -63,6 +63,33 @@ export function validateWeights(weights: Record<ComponentType, number>): {
   return { valid: true, sum };
 }
 
+/**
+ * Sets `component` to `newValue` (0-100) and proportionally rescales every
+ * other component so the full set still sums to 100 — increasing one weight
+ * shrinks the rest in proportion to their current shares, rather than
+ * requiring the user to manually rebalance. If every other component is
+ * currently 0, the remaining budget is split evenly among them.
+ */
+export function redistributeWeight(
+  weights: Record<ComponentType, number>,
+  component: ComponentType,
+  newValue: number,
+): Record<ComponentType, number> {
+  const clamped = Math.min(100, Math.max(0, newValue));
+  const others = COMPONENTS.filter((c) => c !== component);
+  const othersSum = others.reduce((sum, c) => sum + weights[c], 0);
+  const remaining = 100 - clamped;
+
+  const result = { ...weights, [component]: clamped };
+  if (othersSum <= 0) {
+    const share = remaining / others.length;
+    for (const c of others) result[c] = share;
+  } else {
+    for (const c of others) result[c] = (weights[c] / othersSum) * remaining;
+  }
+  return result;
+}
+
 /** Merges a user's saved ComponentWeight rows over the defaults; any component without a row falls back to its default. */
 export function getEffectiveWeights(
   overrides: { component: ComponentType; weight: number }[],

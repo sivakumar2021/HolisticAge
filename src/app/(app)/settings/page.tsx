@@ -27,8 +27,9 @@ export default async function SettingsPage() {
       <Card>
         <h2 className="mb-1 font-semibold text-stone-900">Component weights</h2>
         <p className="mb-4 text-sm text-stone-500">
-          Customize how much each component contributes to your Holistic Age. Weights must sum
-          to 100%.
+          Customize how much each component contributes to your Holistic Age. Drag a slider to
+          give a component more weight — the others automatically shrink to keep the total at
+          100%.
         </p>
         <WeightsEditor initialWeights={weights} />
       </Card>
