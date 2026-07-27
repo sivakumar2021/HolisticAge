@@ -23,13 +23,55 @@ const JOBS = [
   { in: "custom-habits.jpg", out: "public/hero/habits.jpg", width: 1600, cropLeftPct: 38 },
   { in: "custom-learning.jpg", out: "public/hero/learning.jpg", width: 1600, cropLeftPct: 42 },
   { in: "custom-purpose.jpg", out: "public/hero/purpose.jpg", width: 1600, cropLeftPct: 42 },
-  { in: "interconnected-apps.jpg", out: "public/about/interconnected-apps.jpg", width: 1400 },
+  {
+    in: "interconnected-apps.jpg",
+    out: "public/about/interconnected-apps.jpg",
+    width: 1400,
+    // The 3663 Lifestyle and 3663 Fitness spheres render dimmer/less saturated
+    // than Holistic Age and Arc Score in the source graphic. Rather than
+    // brightening the whole image (which would wash out the space background),
+    // this brightens+saturates just those two circular regions and blends the
+    // result back in with a feathered (blurred) alpha mask so there's no hard
+    // edge where the boost starts/stops.
+    brightenSpheres: [
+      { cx: 0.238, cy: 0.674, r: 0.12 }, // 3663 Lifestyle
+      { cx: 0.745, cy: 0.705, r: 0.12 }, // 3663 Fitness
+    ],
+  },
 ];
+
+async function brightenRegions(inPath, spheres) {
+  const { width: W, height: H } = await sharp(inPath).metadata();
+  const maskSvg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+    <filter id="f"><feGaussianBlur stdDeviation="40"/></filter>
+    <g filter="url(#f)">
+      ${spheres.map((s) => `<circle cx="${s.cx * W}" cy="${s.cy * H}" r="${s.r * W}" fill="white"/>`).join("\n")}
+    </g>
+  </svg>`;
+
+  const originalBuffer = await sharp(inPath).toBuffer();
+  const boostedBuffer = await sharp(inPath)
+    .modulate({ brightness: 1.4, saturation: 1.6 })
+    .linear(1.15, -10)
+    .toBuffer();
+  const maskBuffer = await sharp(Buffer.from(maskSvg)).png().toBuffer();
+  const maskedBoosted = await sharp(boostedBuffer)
+    .ensureAlpha()
+    .composite([{ input: maskBuffer, blend: "dest-in" }])
+    .toBuffer();
+
+  // Resolved to a buffer (not a lazy Sharp chain) so the caller's later
+  // .resize() runs on this fully-composited image instead of racing sharp's
+  // internal ordering, which applies resize before any queued .composite().
+  return sharp(originalBuffer).composite([{ input: maskedBoosted }]).toBuffer();
+}
 
 for (const job of JOBS) {
   const outPath = path.join(process.cwd(), job.out);
   const inPath = path.join(SRC, job.in);
-  let pipeline = sharp(inPath);
+  let pipeline = job.brightenSpheres
+    ? sharp(await brightenRegions(inPath, job.brightenSpheres))
+    : sharp(inPath);
 
   if (job.cropLeftPct) {
     const meta = await sharp(inPath).metadata();
