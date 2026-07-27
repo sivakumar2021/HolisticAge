@@ -63,31 +63,50 @@ export function validateWeights(weights: Record<ComponentType, number>): {
   return { valid: true, sum };
 }
 
-/**
- * Sets `component` to `newValue` (0-100) and proportionally rescales every
- * other component so the full set still sums to 100 — increasing one weight
- * shrinks the rest in proportion to their current shares, rather than
- * requiring the user to manually rebalance. If every other component is
- * currently 0, the remaining budget is split evenly among them.
- */
-export function redistributeWeight(
-  weights: Record<ComponentType, number>,
-  component: ComponentType,
-  newValue: number,
-): Record<ComponentType, number> {
-  const clamped = Math.min(100, Math.max(0, newValue));
-  const others = COMPONENTS.filter((c) => c !== component);
-  const othersSum = others.reduce((sum, c) => sum + weights[c], 0);
-  const remaining = 100 - clamped;
+export const MIN_RATING = 1;
+export const MAX_RATING = 10;
 
-  const result = { ...weights, [component]: clamped };
-  if (othersSum <= 0) {
-    const share = remaining / others.length;
-    for (const c of others) result[c] = share;
-  } else {
-    for (const c of others) result[c] = (weights[c] / othersSum) * remaining;
+/**
+ * Converts a per-component 1-10 importance rating into percentage weights
+ * that always sum to exactly 100 — each component's share is just its rating
+ * divided by the total of all ratings. This lets the editor use a simple,
+ * independent rating scale per component instead of requiring the user to
+ * manually keep 9 percentages balanced.
+ */
+export function ratingsToWeights(
+  ratings: Record<ComponentType, number>,
+): Record<ComponentType, number> {
+  const total = COMPONENTS.reduce((sum, c) => sum + ratings[c], 0);
+  const weights = {} as Record<ComponentType, number>;
+  for (const c of COMPONENTS) {
+    weights[c] = total > 0 ? (ratings[c] / total) * 100 : 100 / COMPONENTS.length;
   }
-  return result;
+  return weights;
+}
+
+/**
+ * Derives a starting 1-10 rating per component from existing percentage
+ * weights (e.g. a user's previously saved weights), via min-max scaling —
+ * the largest weight becomes 10, the smallest becomes 1, preserving relative
+ * order. Used only to seed the rating sliders; not an exact inverse of
+ * ratingsToWeights.
+ */
+export function weightsToRatings(
+  weights: Record<ComponentType, number>,
+): Record<ComponentType, number> {
+  const values = COMPONENTS.map((c) => weights[c]);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const ratings = {} as Record<ComponentType, number>;
+  for (const c of COMPONENTS) {
+    if (max === min) {
+      ratings[c] = Math.round((MIN_RATING + MAX_RATING) / 2);
+    } else {
+      const t = (weights[c] - min) / (max - min);
+      ratings[c] = Math.round(MIN_RATING + t * (MAX_RATING - MIN_RATING));
+    }
+  }
+  return ratings;
 }
 
 /** Merges a user's saved ComponentWeight rows over the defaults; any component without a row falls back to its default. */

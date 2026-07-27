@@ -2,10 +2,13 @@ import { describe, expect, it } from "vitest";
 import {
   DEFAULT_WEIGHTS,
   COMPONENTS,
+  MIN_RATING,
+  MAX_RATING,
   sumWeights,
   validateWeights,
   getEffectiveWeights,
-  redistributeWeight,
+  ratingsToWeights,
+  weightsToRatings,
 } from "@/lib/weights";
 
 describe("DEFAULT_WEIGHTS", () => {
@@ -51,42 +54,57 @@ describe("getEffectiveWeights", () => {
   });
 });
 
-describe("redistributeWeight", () => {
-  it("always sums to 100 after a change", () => {
-    const result = redistributeWeight(DEFAULT_WEIGHTS, "PURPOSE", 40);
-    expect(sumWeights(result)).toBeCloseTo(100, 5);
+describe("ratingsToWeights", () => {
+  it("always sums to 100", () => {
+    const ratings = Object.fromEntries(
+      COMPONENTS.map((c, i) => [c, 1 + (i % MAX_RATING)]),
+    ) as Record<(typeof COMPONENTS)[number], number>;
+    expect(sumWeights(ratingsToWeights(ratings))).toBeCloseTo(100, 5);
   });
 
-  it("sets the target component exactly, clamped to [0, 100]", () => {
-    expect(redistributeWeight(DEFAULT_WEIGHTS, "PURPOSE", 40).PURPOSE).toBe(40);
-    expect(redistributeWeight(DEFAULT_WEIGHTS, "PURPOSE", 150).PURPOSE).toBe(100);
-    expect(redistributeWeight(DEFAULT_WEIGHTS, "PURPOSE", -20).PURPOSE).toBe(0);
-  });
-
-  it("shrinks the other components in proportion to their prior shares", () => {
-    const result = redistributeWeight(DEFAULT_WEIGHTS, "PURPOSE", 40);
-    // Mental and Physical were equal (18/18) before; they should stay equal after.
-    expect(result.MENTAL).toBeCloseTo(result.PHYSICAL, 5);
-    // Every other component should have shrunk relative to its default.
-    for (const c of COMPONENTS.filter((c) => c !== "PURPOSE")) {
-      expect(result[c]).toBeLessThan(DEFAULT_WEIGHTS[c]);
+  it("splits evenly when every rating is equal", () => {
+    const equal = Object.fromEntries(COMPONENTS.map((c) => [c, 5])) as Record<
+      (typeof COMPONENTS)[number],
+      number
+    >;
+    const result = ratingsToWeights(equal);
+    for (const c of COMPONENTS) {
+      expect(result[c]).toBeCloseTo(100 / COMPONENTS.length, 5);
     }
   });
 
-  it("splits the remaining budget evenly when every other component is 0", () => {
-    const allZero = Object.fromEntries(COMPONENTS.map((c) => [c, 0])) as typeof DEFAULT_WEIGHTS;
-    const result = redistributeWeight(allZero, "MENTAL", 10);
-    expect(result.MENTAL).toBe(10);
-    const others = COMPONENTS.filter((c) => c !== "MENTAL");
-    for (const c of others) {
-      expect(result[c]).toBeCloseTo(90 / others.length, 5);
-    }
+  it("gives a component twice the rating twice the percentage", () => {
+    const ratings = Object.fromEntries(COMPONENTS.map((c) => [c, 5])) as Record<
+      (typeof COMPONENTS)[number],
+      number
+    >;
+    ratings.PURPOSE = 10;
+    const result = ratingsToWeights(ratings);
+    expect(result.PURPOSE).toBeCloseTo(result.MENTAL * 2, 5);
+  });
+});
+
+describe("weightsToRatings", () => {
+  it("maps the largest weight to MAX_RATING and the smallest to MIN_RATING", () => {
+    const ratings = weightsToRatings(DEFAULT_WEIGHTS);
+    expect(ratings.MENTAL).toBe(MAX_RATING);
+    expect(ratings.PHYSICAL).toBe(MAX_RATING);
+    expect(ratings.CAREER).toBe(MIN_RATING);
   });
 
-  it("pushing one component to 100 zeroes out the rest", () => {
-    const result = redistributeWeight(DEFAULT_WEIGHTS, "MENTAL", 100);
-    for (const c of COMPONENTS.filter((c) => c !== "MENTAL")) {
-      expect(result[c]).toBe(0);
+  it("round-trips back through ratingsToWeights to something that still sums to 100", () => {
+    const ratings = weightsToRatings(DEFAULT_WEIGHTS);
+    expect(sumWeights(ratingsToWeights(ratings))).toBeCloseTo(100, 5);
+  });
+
+  it("gives every component the same midpoint rating when weights are all equal", () => {
+    const equal = Object.fromEntries(COMPONENTS.map((c) => [c, 100 / COMPONENTS.length])) as Record<
+      (typeof COMPONENTS)[number],
+      number
+    >;
+    const ratings = weightsToRatings(equal);
+    for (const c of COMPONENTS) {
+      expect(ratings[c]).toBe(Math.round((MIN_RATING + MAX_RATING) / 2));
     }
   });
 });
