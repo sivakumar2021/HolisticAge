@@ -35,13 +35,15 @@ const PRODUCTS = [
 export default function AboutPage() {
   return (
     <div>
-      <section className="relative isolate h-[60vh] min-h-[420px] overflow-hidden">
+      <section className="relative isolate h-[38vh] min-h-[280px] max-h-[440px] overflow-hidden">
+        {/* object-contain (not cover) so the whole diagram — every orbiting component — stays
+            visible within this band instead of being cropped at the top/bottom edges. */}
         <Image
           src="/about/interconnected-apps.jpg"
           alt="Ageless Living at the center, connected to Holistic Age, Arc Score, 3663 Lifestyle, and 3663 Fitness"
           fill
           priority
-          className="object-cover"
+          className="object-contain"
         />
         {/* Lightens the source graphic's saturated space theme so it doesn't clash with the site's airy palette, and fades to white at the bottom so it melts into the page instead of cutting off sharply. */}
         <div className="absolute inset-0 bg-white/15" />
