@@ -25,12 +25,26 @@ export default async function DashboardPage() {
       <div className="mx-auto max-w-3xl px-6 py-12">
         <Card className="text-center">
           <h1 className="mb-2 text-2xl font-semibold text-stone-900">Welcome to Holistic Age</h1>
-          <p className="mb-6 text-stone-500">
-            Run your first assessment to find out your Holistic Age.
-          </p>
-          <Link href="/assessment">
-            <Button>Start your first assessment</Button>
-          </Link>
+          {user.birthDate ? (
+            <>
+              <p className="mb-6 text-stone-500">
+                Run your first assessment to find out your Holistic Age.
+              </p>
+              <Link href="/assessment">
+                <Button>Start your first assessment</Button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <p className="mb-6 text-stone-500">
+                Holistic Age is computed relative to your calendar age, so set your birth date
+                before running your first assessment.
+              </p>
+              <Link href="/settings">
+                <Button>Set your birth date</Button>
+              </Link>
+            </>
+          )}
         </Card>
       </div>
     );
