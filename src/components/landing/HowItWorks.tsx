@@ -31,7 +31,7 @@ export function HowItWorks() {
               <div className="mb-1 flex items-center justify-between">
                 <h3 className="font-semibold text-emerald-900">{COMPONENT_LABELS[c]}</h3>
                 <span className="text-xs font-medium text-amber-700">
-                  {DEFAULT_WEIGHTS[c]}%
+                  {DEFAULT_WEIGHTS[c].toFixed(1)}%
                 </span>
               </div>
               <p className="text-sm text-stone-500">{DESCRIPTIONS[c]}</p>
