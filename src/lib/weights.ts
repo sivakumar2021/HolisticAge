@@ -24,20 +24,21 @@ export const COMPONENT_LABELS: Record<ComponentType, string> = {
   PURPOSE: "Purpose",
 };
 
-// Purpose (new, added at the user's request beyond the original graphic) is
-// weighted at 10%, the same as Relationships/Social/Habits/Learning. The
-// original 8 weights are scaled by 0.9 to make room while preserving their
-// relative importance to each other.
+// All nine components are weighted equally by default (100 / 9 each), so no
+// single component dominates a user's Holistic Age until they customize
+// weights in Settings.
+const EQUAL_WEIGHT = 100 / COMPONENTS.length;
+
 export const DEFAULT_WEIGHTS: Record<ComponentType, number> = {
-  MENTAL: 18,
-  PHYSICAL: 18,
-  FINANCIAL: 9,
-  CAREER: 7.2,
-  RELATIONSHIPS: 10.8,
-  SOCIAL: 9,
-  HABITS: 9,
-  LEARNING: 9,
-  PURPOSE: 10,
+  MENTAL: EQUAL_WEIGHT,
+  PHYSICAL: EQUAL_WEIGHT,
+  FINANCIAL: EQUAL_WEIGHT,
+  CAREER: EQUAL_WEIGHT,
+  RELATIONSHIPS: EQUAL_WEIGHT,
+  SOCIAL: EQUAL_WEIGHT,
+  HABITS: EQUAL_WEIGHT,
+  LEARNING: EQUAL_WEIGHT,
+  PURPOSE: EQUAL_WEIGHT,
 };
 
 const WEIGHT_SUM_TOLERANCE = 0.01;

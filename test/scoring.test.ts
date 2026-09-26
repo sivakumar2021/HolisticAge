@@ -67,7 +67,7 @@ describe("computeHolisticAge", () => {
 
   it("weights components proportionally", () => {
     const ages = Object.fromEntries(COMPONENTS.map((c) => [c, 50])) as Record<ComponentType, number>;
-    ages.MENTAL = 20; // youngest, heavily weighted (18%)
+    ages.MENTAL = 20; // youngest component age
     const holisticAge = computeHolisticAge(ages, DEFAULT_WEIGHTS);
     expect(holisticAge).toBeLessThan(50);
   });

@@ -86,7 +86,14 @@ describe("ratingsToWeights", () => {
 
 describe("weightsToRatings", () => {
   it("maps the largest weight to MAX_RATING and the smallest to MIN_RATING", () => {
-    const ratings = weightsToRatings(DEFAULT_WEIGHTS);
+    const varied = Object.fromEntries(COMPONENTS.map((c) => [c, 10])) as Record<
+      (typeof COMPONENTS)[number],
+      number
+    >;
+    varied.MENTAL = 20;
+    varied.PHYSICAL = 20;
+    varied.CAREER = 4;
+    const ratings = weightsToRatings(varied);
     expect(ratings.MENTAL).toBe(MAX_RATING);
     expect(ratings.PHYSICAL).toBe(MAX_RATING);
     expect(ratings.CAREER).toBe(MIN_RATING);
